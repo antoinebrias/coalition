@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulateur de Coalition</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #4A90E2;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .left-side, .right-side {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        .coalition-container {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .coalition-details {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .pie-chart {
+            flex: 1;
+            max-width: 400px;
+            max-height: 400px;
+            padding: 20px;
+        }
+
+        .form-container {
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        input[type="submit"] {
+            background-color: #4A90E2;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #357ABD;
+        }
+
+        .column {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #results {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        #state-space-graph {
+            width: 100%;
+            height: 600px; /* Augmenter la hauteur pour un graphique plus grand */
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  
+
+<header class="container">
+    <div>
+    <h1>Simulateur de Coalitions à Majorité Absolue</h1>
+    <p>Bienvenue sur le Simulateur de Coalitions à Majorité Absolue, une application dédiée à l'exploration des possibilités de coalition politique suite au second tour des législatives françaises de 2024. Cet outil vous permet d'explorer diverses combinaisons de partis politiques et d'évaluer leur impact sur la composition du gouvernement.</p>
+    
+    <h2>Fonctionnalités :</h2>
+    <ul>
+        <li><strong>Exploration des Coalitions :</strong> Découvrez trois coalitions potentielles fondées sur différents critères : celle avec le moins de partis et le plus de sièges, celle avec la distance minimale et le plus de sièges, et celle avec la distance minimale et le moins de partis.</li>
+        <li><strong>Visualisation de l'Espace d'État :</strong> Le graphique d'espace d'état vous montre la distribution des coalitions ayant une majorité absolue. Vous pouvez analyser comment ces coalitions varient en fonction du nombre de partis, du nombre de sièges et de la distance entre les partis dans le paysage politique simulé.</li>
+        <li><strong>En cliquant sur un point </strong>  du graphique, vous pouvez obtenir des détails précis sur la coalition représentée, y compris les partis impliqués, le nombre total de sièges obtenus, et la distance entre les partis membres.</li>
+    </ul>
+    
+  
+
+  </div>
+</header>
+
+
+    <div class="form-container">
+        <h2>Contraintes :</h2>
+        <form id="coalitionForm" action="/calculate" method="post">
+            <label>
+                <input type="checkbox" name="constraints" value="no_rn_lfi">
+                Pas de coalition possible entre le RN et LFI
+            </label><br>
+            <label>
+                <input type="checkbox" name="constraints" value="no_macron_lfi">
+                Pas de coalition possible entre le bloc macroniste et LFI
+            </label><br>
+            <label>
+                <input type="checkbox" name="constraints" value="no_macron_rn">
+                Pas de coalition possible entre le bloc macroniste et le RN
+            </label><br>
+            <label>
+                <input type="checkbox" name="constraints" value="no_lr_lfi">
+                Pas de coalition possible entre les LR et LFI
+            </label><br><br>
+            <input type="submit" value="Calculer">
+        </form>
+    </div>
+
+    <div id="results" class="hidden">
+        <!-- Ici seront affichés les résultats -->
+    </div>
+
+
+    <div id="state-space" class="form-container hidden">
+<li   class="coalition-container">
+        <div class="column">
+            <h2>Espace d'états</h2>
+            <div id="state-space-graph"></div>
+        </div>
+        <div class="column">
+            <h2>Coalition sélectionnée</h2>
+            <div id="pie-chart-container"></div>
+        </div>
+</li>
+    </div>
+
+
+<footer class="container">
+    <div>
+        <p>Développé par Antoine Brias. Le code est disponible sur mon <a href="https://github.com/antoinebrias/coalition" target="_blank"> GitHub</a>.</p>
+    </div>
+    <div>
+        <h3>Liens utiles</h3>
+        <ul>
+            <li><a href="https://www.linkedin.com/in/antoine-brias-2b64841a9/" target="_blank">LinkedIn</a></li>
+            <li><a href="https://www.briaslab.fr/blog/" target="_blank">Blog</a></li>
+
+        </ul>
+    </div>
+</footer>
+
+
+    <script>
+        let results = [];
+
+        function updateResults(results) {
+            var resultsDiv = document.getElementById('results');
+            document.getElementById('results').classList.remove('hidden');
+            resultsDiv.innerHTML = '';
+
+            if (results.length > 0) {
+                var html = '<h2>Exemples de coalitions optimales</h2><ul>';
+
+                results.forEach(function(coalition, index) {
+                    html += '<li class="coalition-container">';
+                    html += '<div class="coalition-details">';
+                    if (index === 0) {
+                        html += '<h3>Coalition avec le moins de partis et le plus de sièges</h3>';
+                    } else if (index === 1) {
+                        html += '<h3>Coalition avec la distance minimale et le plus de sièges</h3>';
+                    } else if (index === 2) {
+                        html += '<h3>Coalition avec la distance minimale et le moins de partis</h3>';
+                    }
+
+                    html += '<p>Partis : ' + coalition.partis.join(', ') + '</p>';
+                    html += '<p>Nombre de partis : ' + coalition.nombre_partis + '</p>';
+                    html += '<p>Sièges totaux : ' + coalition.total_sieges + '</p>';
+                    html += '<p>Distance : ' + coalition.distance + '</p>';
+                    html += '</div>';
+
+                    html += '<div class="pie-chart" id="pie-chart-' + index + '">';
+                    html += '</div>';
+
+                    html += '</li>';
+                });
+
+                html += '</ul>';
+                resultsDiv.innerHTML = html;
+
+                results.forEach(function(_, index) {
+                    generatePieChart(index);
+                });
+            } else {
+                resultsDiv.innerHTML = '<p>Aucune coalition trouvée.</p>';
+            }
+        }
+
+        function generatePieChart(index) {
+            var coalitionData = results[index];
+
+            fetch('/generate_pie_chart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(coalitionData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                var pieChartDiv = document.getElementById('pie-chart-' + index);
+                pieChartDiv.innerHTML = '<embed type="image/svg+xml" src="' + data.chart + '">';
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération du graphique de coalition :', error);
+            });
+        }
+
+        function updateStateSpaceGraph(stateSpaceData) {
+    var markerColors = stateSpaceData.color;
+
+    var trace1 = {
+        x: stateSpaceData.nombre_partis,
+        y: stateSpaceData.total_sieges,
+        z: stateSpaceData.distance,
+        coalitions: stateSpaceData.coalitions,
+        mode: 'markers',
+        type: 'scatter3d',
+        marker: {
+            size: 3,
+            color: markerColors,
+            opacity: 0.6,
+            line: {
+                color: 'rgba(0, 0, 0, 0.5)',
+                width: 0.5
+            }
+        },
+        text: stateSpaceData.coalitions.map(function(coalition) {
+            return 'Nombre de partis: ' + coalition.nombre_partis + '<br>' +
+                   'Sièges totaux: ' + coalition.total_sieges + '<br>' +
+                   'Distance: ' + coalition.distance;
+        })
+    };
+
+    var data = [trace1];
+
+    var layout = {
+        scene: {
+            xaxis: {title: 'Nombre de partis'},
+            yaxis: {title: 'Nombre de sièges'},
+            zaxis: {title: 'Distance'}
+        }
+    };
+
+    Plotly.newPlot('state-space-graph', data, layout);
+    document.getElementById('state-space').classList.remove('hidden');
+    var stateSpaceGraph = document.getElementById('state-space-graph');
+    stateSpaceGraph.on('plotly_click', function(data) {
+        var pointIndex = data.points[0].pointIndex;
+        var coalition = data.points[0].data.coalitions[data.points[0].pointNumber];
+
+        // Afficher les infos de la coalition sélectionnée
+        var infoContainer = document.createElement('div');
+        infoContainer.innerHTML = `
+            <h3>Coalition sélectionnée</h3>
+            <p>Partis : ${coalition.partis.join(', ')}</p>
+            <p>Nombre de partis : ${coalition.nombre_partis}</p>
+            <p>Sièges totaux : ${coalition.total_sieges}</p>
+            <p>Distance : ${coalition.distance}</p>
+        `;
+
+        var pieChartContainer = document.getElementById('pie-chart-container');
+        pieChartContainer.innerHTML = '';
+        pieChartContainer.appendChild(infoContainer);
+
+        fetch('/generate_pie_chart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(coalition)
+        })
+        .then(response => response.json())
+        .then(data => {
+            var pieChart = document.createElement('embed');
+            pieChart.type = 'image/svg+xml';
+            pieChart.src = data.chart;
+            pieChartContainer.appendChild(pieChart);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la génération du graphique en camembert :', error);
+        });
+    });
+}
+
+        var form = document.getElementById('coalitionForm');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(form);
+
+            fetch('/calculate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                results = data.top_coalitions;
+                updateResults(data.top_coalitions);
+                updateStateSpaceGraph(data.state_space_data);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des données :', error);
+            });
+        });
+    </script>
+</body>
+</html>
+
