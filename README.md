@@ -1,6 +1,6 @@
 # Simulateur de Coalitions à Majorité Absolue
 
-Bienvenue dans le Simulateur de Coalitions à Majorité Absolue! Ce projet est une application web conçue pour explorer les possibilités de coalition politique après les élections législatives de 2024 en France. L'objectif est de permettre aux utilisateurs d'évaluer diverses combinaisons de partis politiques et leur impact potentiel sur la composition du gouvernement.
+Ce projet est une application web conçue pour explorer les possibilités de coalition politique après les élections législatives de 2024 en France. L'objectif est de permettre aux utilisateurs d'évaluer diverses combinaisons de partis politiques et leur impact potentiel sur la composition du gouvernement.
 
 ## Fonctionnalités
 
@@ -27,7 +27,7 @@ Bienvenue dans le Simulateur de Coalitions à Majorité Absolue! Ce projet est u
 
 ## Contribuer
 
-Si vous souhaitez contribuer à ce projet, vous êtes les bienvenus! Voici comment vous pouvez démarrer :
+Si vous souhaitez contribuer à ce projet, vous êtes les bienvenus!
 
 1. Clonez ce dépôt : `git clone https://github.com/antoinebrias/coalition.git`
 2. Installez les dépendances nécessaires : `pip install -r requirements.txt`
